@@ -1,0 +1,11 @@
+{
+  "name": "email-registration-popup",
+  "version": "1.0.0",
+  "description": "popup for customer to register email when an event occurs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "aashi <aashi.malhotra@proptiger.com>",
+  "license": "ISC"
+}
