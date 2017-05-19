@@ -4,6 +4,7 @@ var popupPlug=(function(){
         //element references
         this.closeButton = null;
         this.trigger=false;
+        this.pop=null;
         this.popup = null,this.popupContact=null;
 
         // default parameters if user does not provide
@@ -39,7 +40,6 @@ var popupPlug=(function(){
 
     close = function()
     {
-        console.log("hello");
         this.trigger=false;
         if(typeof this.options.callback ==="function"){
         var userInfo = { email: document.getElementById("email").value
@@ -75,9 +75,13 @@ var popupPlug=(function(){
     }
 
     buildOut=function(){
-        var form,name,email,message,heading,submit,row;
+        var form,headerDiv,name,email,message,heading,submit,row,para;
 
         //popup div
+
+        this.pop=document.createElement("div");
+        this.pop.className="pop-container";
+
         this.popup = document.createElement("div");
         this.popup.id="popupStart";
 
@@ -87,18 +91,40 @@ var popupPlug=(function(){
         if (this.options.closeButton === true) {
             this.closeButton = document.createElement("button");
             this.closeButton.id = "close";
+            if(this.options.theme=='red')
+            {
+                this.closeButton.className='red';
+            }
+            else
+            {
+                this.closeButton.className='orange';
+            }
             this.closeButton.innerHTML = "X";
         }
 
-        this.popupContact.appendChild(this.closeButton);
+
+        // this.popupContact.appendChild(this.closeButton);
 
         if(this.options.form) {
             form=document.createElement("form");
             heading=document.createElement("h2");
+            heading.id='leaveHeading';
+            if(this.options.theme=='red')
+            {
+                heading.className='red';
+            }
+            else
+            {
+                heading.className='orange';
+            }
             heading.innerHTML="Before Leaving Us!";
             form.appendChild(heading);
+            form.appendChild(this.closeButton);
             row= document.createElement("hr");
             form.appendChild(row);
+            para=document.createElement("p");
+            para.innerHTML="Get FREE access to Real-Estate tips & useful resources.";
+            form.appendChild(para);
             if(this.options.form.email!=null)
             {
                 email=document.createElement("input");
@@ -113,17 +139,25 @@ var popupPlug=(function(){
             form.appendChild(noEmail);
             submit=document.createElement("button");
             submit.id="submit";
+            if(this.options.theme=='red')
+            {
+                submit.className='red';
+            }
+            else
+            {
+                submit.className='orange';
+            }
             submit.innerHTML="Yes I Am Interested";
             form.appendChild(submit);
             this.popupContact.appendChild(form);
         }
         this.popup.appendChild(this.popupContact);
-        document.body.appendChild(this.popup);
+        this.pop.appendChild(this.popup);
+        document.body.appendChild(this.pop);
     }
 
     initializeEvents=function()
     {
-        console.log("*****",this);
         if (this.closeButton) {
             document.getElementById("close").addEventListener('click', close.bind(this));
         }
