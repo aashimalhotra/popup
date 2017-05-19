@@ -1,4 +1,6 @@
-#popupStart {
+
+
+.pop-container #popupStart {
     width: 100%;
     height: 100%;
     opacity: .95;
@@ -7,68 +9,91 @@
     display: block;
     position: fixed;
     background-color: #313131;
-    overflow: auto
+    overflow: auto;
 }
-
-div#popupContact {
+.pop-container .orange#close {
+    position: absolute;
+    right: 2px;
+    top: 5px;
+    background-color: white;
+    border-color: white;
+    background: none;
+    border: none;
+    color: #fcad36;
+}
+.pop-container .red#close {
+    position: absolute;
+    right: 2px;
+    top: 5px;
+    background-color: white;
+    border-color: white;
+    background: none;
+    border: none;
+    color: #990000;
+}
+.pop-container div#popupContact {
     position: absolute;
     left: 50%;
     top: 17%;
     margin-left: -202px;
-    font-family: 'Raleway', sans-serif
+    font-family: 'Raleway', sans-serif;
 }
-
-form {
-    max-width: 300px;
-    min-width: 250px;
-    padding: 10px 50px;
+.pop-container form {
+    min-width: 357px;
     border: 2px solid gray;
     border-radius: 10px;
     font-family: raleway;
-    background-color: #fff
-}
-
-p {
-    margin-top: 30px
-}
-
-h2 {
-    background-color: #FEFFED;
-    padding: 20px 35px;
-    margin: -10px -50px;
     text-align: center;
-    border-radius: 10px 10px 0 0
+    position: absolute;
+    background-color: #fff;
 }
-
-hr {
-    margin: 10px -50px;
+.pop-container p {
+    margin-top: 15px;
+}
+.pop-container h2#leaveHeading.orange {
+    background-color: #f3f3f3;
+    margin: auto;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.pop-container h2#leaveHeading.red {
+    background-color: #f3f3f3;
+    margin: auto;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.pop-container hr {
+    margin: 0px -50px;
     border: 0;
-    border-top: 1px solid #ccc
+    width: 100%;
+    display: inline-block;
+    border-top: 1px solid #ccc;
 }
-
-input[type=text] {
-    width: 82%;
+.pop-container input[type=text] {
+    width: 90%;
     padding: 10px;
-    margin-top: 30px;
+    margin-top: 7px;
     border: 1px solid #ccc;
-    padding-left: 40px;
+    padding-left: 12px;
     font-size: 16px;
-    font-family: raleway
+    font-family: raleway;
 }
-
-#name {
+.pop-container #name {
     background-repeat: no-repeat;
     background-position: 5px 7px;
     margin-bottom: 30px;
 }
-
-#email {
+.pop-container #email {
     background-repeat: no-repeat;
-    background-position: 5px 7px;
+    /*background-position: 7px px;*/
+    
     margin-bottom: 30px;
 }
-
-textarea {
+.pop-container textarea {
     background-repeat: no-repeat;
     background-position: 5px 7px;
     width: 82%;
@@ -80,30 +105,43 @@ textarea {
     padding-left: 40px;
     font-size: 16px;
     font-family: raleway;
-    margin-bottom: 30px
+    margin-bottom: 30px;
 }
-
-#submit {
+.pop-container .orange#submit {
     text-decoration: none;
-    width: 100%;
+    width: 75%;
+    margin-bottom: 20px;
     text-align: center;
-    display: block;
-    background-color: #FFBC00;
+    display: inline-block;
+    background-color: #fcad36;
     color: #fff;
-    border: 1px solid #FFCB00;
+    border: 1px solid #fcad36;
     padding: 10px 0;
     font-size: 20px;
     cursor: pointer;
-    border-radius: 5px
+    border-radius: 5px;
 }
-
-span {
+.pop-container .red#submit {
+    text-decoration: none;
+    width: 75%;
+    margin-bottom: 20px;
+    text-align: center;
+    display: inline-block;
+    background-color: #990000;
+    color: #fff;
+    border: 1px solid #990000;
+    padding: 10px 0;
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+.pop-container span {
     color: red;
-    font-weight: 700
+    font-weight: 700;
 }
-
-#noEmail {
+.pop-container #noEmail {
     color: red;
     text-align: center;
-    display: none
+    display: none;
+    margin-bottom: 10px;
 }
