@@ -19,8 +19,14 @@ Example:
 			defaultBehaviour: You can turn on or turn off the default behaviour.
 			theme: As of now only red and orange themes are implemented.
 
+You can also pass some extra parameters such as the main heading,para just below heading and the text on the close aur submit button. For all these use the following variables: mainHeading,para,submitText,closeText.
+
 4) Call the open function to display the popup if you are not using the default behaviour.
 
 			document.getElementById("popupButton").onclick=function(){
 				object.open();
 			};
+
+5) Return the status of registration from the callback. If the status is success a thankyou message will be shown. If the user is already subscribed message will be shown that user is already subscribed. If some error occurs the popup will not close. 
+
+6) In mobile this popup opens when user has scrolled the page over 70%.
