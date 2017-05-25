@@ -1,4 +1,5 @@
 var popupPlug=(function(){
+    var popupObj;
     var Popup=function()
     {
         //element references
@@ -9,6 +10,10 @@ var popupPlug=(function(){
 
         // default parameters if user does not provide
         var defaults = {
+            mainHeading: 'Before Leaving Us!',
+            para: 'Get FREE access to Real-Estate tips & useful resources.',
+            submitText: 'Yes I Am Interested',
+            closeText: 'Close',
             closeButton: true,
             form: {email: ""}
         }
@@ -18,44 +23,108 @@ var popupPlug=(function(){
         }
         if(this.options.defaultBehaviour=='on')
         {
-            var popupObj=this;
-            document.addEventListener('DOMContentLoaded',function()
+            document.addEventListener('mouseleave',triggerCallback);
+            if(isMobile(window))
             {
-                document.onmouseleave=function()
-                {
-                    if(popupObj.trigger!=true)
+                var flag70=0;
+                var winHeight= $(document).height();
+                $(window).scroll(function(){
+                    var wintop = $(window).scrollTop();
+                    var height = (wintop/(winHeight))*100;
+                    if(height>65 && flag70==0)
                     {
-                        popupObj.trigger=true;
-                        popupObj.open();
-                    }
-                }
-            });
+                        triggerCallback();
+                        flag70=1;
+                    }                 
+                });
+            }
+        }
+        popupObj=this;
+    }
+
+    var isMobile = function($window) {
+       var data = $window.navigator.userAgent || $window.navigator.vendor || $window.opera;
+       return /iPhone|iPod|iPad|Silk|Android|BlackBerry|Opera Mini|IEMobile/.test(data)
+    }
+
+    var triggerCallback=function()
+    {
+        if(popupObj.trigger!=true)
+        {
+            popupObj.trigger=true;
+            popupObj.open();
         }
     }
-    Popup.prototype.open = function(event)
+
+    Popup.prototype.open = function()
     {
         buildOut.call(this);
         initializeEvents.call(this);
     }
 
-    close = function()
+    Popup.prototype.removeDefault= function()
+    {
+        document.removeEventListener("mouseleave", triggerCallback);
+        window.removeEventListener("focus", triggerCallback);
+    }
+
+    Popup.prototype.remove = function()
+    {
+        this.popup.parentNode.removeChild(this.popup);
+
+    }
+
+    var submit = function()
     {
         this.trigger=false;
         if(typeof this.options.callback ==="function"){
         var userInfo = { email: document.getElementById("email").value
             }
-            this.options.callback(userInfo);    
+            var that =this;
+            this.options.callback(userInfo,this).then(function(result){
+                if(result=='Already Subscribed')
+                {
+                    showAlreadySubscribed.call(that);
+                }
+                else if(result=='success')
+                {
+                    subscribe.call(that);
+                }
+            },function(err){
+                // console.log("error in registering");
+            });
         }
-        this.popup.parentNode.removeChild(this.popup);
     }
 
-    validateEmail = function()
+    var subscribe = function()
+    {
+        this.popupContact.getElementsByClassName('formElements')[0].style.display='none';
+        this.popupContact.getElementsByClassName('thankyou')[0].style.display='block';
+    }
+
+    var showAlreadySubscribed = function()
+    {
+        this.popupContact.getElementsByClassName('formElements')[0].style.display='none';
+        this.popupContact.getElementsByClassName('subscribed')[0].style.display='block';
+    }
+
+    var close = function()
+    {
+        this.trigger=false;
+        var closeEvent=new Event("closeEvent");
+        document.dispatchEvent(closeEvent);
+        this.popup.parentNode.removeChild(this.popup);
+
+    }
+
+    var validateEmail = function(event)
     {
         var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         var email= document.getElementById("email").value.toLowerCase();
         if(re.test(email)===true)
         {
-            close.call(this);
+            event.preventDefault();
+            submit.call(this);
         }
         else
         {
@@ -64,7 +133,7 @@ var popupPlug=(function(){
         }
     }
 
-    extendDefaults= function(source, properties) {
+    var extendDefaults= function(source, properties) {
         var property;
         for (property in properties) {
             if (properties.hasOwnProperty(property)) {
@@ -74,8 +143,8 @@ var popupPlug=(function(){
         return source;
     }
 
-    buildOut=function(){
-        var form,headerDiv,name,email,message,heading,submit,row,para;
+    var buildOut=function(){
+        var form,headerDiv,name,email,message,heading,closeSuccess,closeSuscribed,submit,para,formElements,subscribed,thankyou;
 
         //popup div
 
@@ -101,11 +170,15 @@ var popupPlug=(function(){
             }
             this.closeButton.innerHTML = "X";
         }
-
-
-        // this.popupContact.appendChild(this.closeButton);
-
         if(this.options.form) {
+            subscribed=document.createElement("div");
+            subscribed.className='subscribed';
+            subscribed.innerHTML='You Are Already Subscribed!';
+            thankyou=document.createElement("div");
+            thankyou.className='thankyou';
+            thankyou.innerHTML='Thankyou For Subscribing With Us!';
+            formElements=document.createElement("div");
+            formElements.className='formElements';
             form=document.createElement("form");
             heading=document.createElement("h2");
             heading.id='leaveHeading';
@@ -117,26 +190,24 @@ var popupPlug=(function(){
             {
                 heading.className='orange';
             }
-            heading.innerHTML="Before Leaving Us!";
+            heading.innerHTML=this.options.mainHeading;
             form.appendChild(heading);
             form.appendChild(this.closeButton);
-            row= document.createElement("hr");
-            form.appendChild(row);
             para=document.createElement("p");
-            para.innerHTML="Get FREE access to Real-Estate tips & useful resources.";
-            form.appendChild(para);
+            para.innerHTML=this.options.para;
+            formElements.appendChild(para);
             if(this.options.form.email!=null)
             {
                 email=document.createElement("input");
                 email.id="email";
                 email.placeholder="email";
                 email.type="text";
-                form.appendChild(email);
+                formElements.appendChild(email);
             }
             var noEmail=document.createElement("div");
             noEmail.innerHTML="please enter valid email address";
             noEmail.id="noEmail";
-            form.appendChild(noEmail);
+            formElements.appendChild(noEmail);
             submit=document.createElement("button");
             submit.id="submit";
             if(this.options.theme=='red')
@@ -147,16 +218,45 @@ var popupPlug=(function(){
             {
                 submit.className='orange';
             }
-            submit.innerHTML="Yes I Am Interested";
-            form.appendChild(submit);
+            submit.innerHTML=this.options.submitText;
+            closeSuccess=document.createElement("button");
+            closeSuccess.id="closeSuccess";
+            if(this.options.theme=='red')
+            {
+                closeSuccess.className='red';
+            }
+            else
+            {
+                closeSuccess.className='orange';
+            }
+            closeSuccess.innerHTML=this.options.closeText;
+            closeSuscribed=document.createElement("button");
+            closeSuscribed.id="closeSuscribed";
+            if(this.options.theme=='red')
+            {
+                closeSuscribed.className='red';
+            }
+            else
+            {
+                closeSuscribed.className='orange';
+            }
+            closeSuscribed.innerHTML=this.options.closeText;
+            formElements.appendChild(submit);
+            subscribed.appendChild(closeSuscribed);
+            thankyou.appendChild(closeSuccess);
+            form.appendChild(formElements);
+            form.appendChild(subscribed);
+            form.appendChild(thankyou);
             this.popupContact.appendChild(form);
         }
         this.popup.appendChild(this.popupContact);
         this.pop.appendChild(this.popup);
         document.body.appendChild(this.pop);
+        var visibleEvent=new Event("visibleEvent");
+        document.dispatchEvent(visibleEvent);
     }
 
-    initializeEvents=function()
+    var initializeEvents=function()
     {
         if (this.closeButton) {
             document.getElementById("close").addEventListener('click', close.bind(this));
