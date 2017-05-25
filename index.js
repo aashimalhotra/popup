@@ -65,7 +65,6 @@ var popupPlug=(function(){
     Popup.prototype.removeDefault= function()
     {
         document.removeEventListener("mouseleave", triggerCallback);
-        window.removeEventListener("focus", triggerCallback);
     }
 
     Popup.prototype.remove = function()
