@@ -76,11 +76,11 @@ var popupPlug=(function(){
     var submit = function()
     {
         this.trigger=false;
-        if(typeof this.options.callback ==="function"){
+        if(typeof this.options.submit ==="function"){
         var userInfo = { email: document.getElementById("email").value
             }
             var that =this;
-            this.options.callback(userInfo,this).then(function(result){
+            this.options.submit(userInfo,this).then(function(result){
                 if(result=='Already Subscribed')
                 {
                     showAlreadySubscribed.call(that);
@@ -97,21 +97,30 @@ var popupPlug=(function(){
 
     var subscribe = function()
     {
+        var that=this;
         this.popupContact.getElementsByClassName('formElements')[0].style.display='none';
         this.popupContact.getElementsByClassName('thankyou')[0].style.display='block';
+        document.getElementById("popupCloseSuccess").addEventListener('click',function(event){
+            event.preventDefault();
+            that.options.subscribeClose(that);
+        })
     }
 
     var showAlreadySubscribed = function()
     {
+        var that=this;
         this.popupContact.getElementsByClassName('formElements')[0].style.display='none';
         this.popupContact.getElementsByClassName('subscribed')[0].style.display='block';
+        document.getElementById('popupCloseSuscribed').addEventListener('click',function(event){
+            event.preventDefault();
+            that.options.subscribeClose(that);
+        })
     }
 
     var close = function()
     {
         this.trigger=false;
-        var closeEvent=new Event("closeEvent");
-        document.dispatchEvent(closeEvent);
+        this.options.close(this);
         this.popup.parentNode.removeChild(this.popup);
 
     }
@@ -219,7 +228,7 @@ var popupPlug=(function(){
             }
             submit.innerHTML=this.options.submitText;
             closeSuccess=document.createElement("button");
-            closeSuccess.id="closeSuccess";
+            closeSuccess.id="popupCloseSuccess";
             if(this.options.theme=='red')
             {
                 closeSuccess.className='red';
@@ -230,7 +239,7 @@ var popupPlug=(function(){
             }
             closeSuccess.innerHTML=this.options.closeText;
             closeSuscribed=document.createElement("button");
-            closeSuscribed.id="closeSuscribed";
+            closeSuscribed.id="popupCloseSuscribed";
             if(this.options.theme=='red')
             {
                 closeSuscribed.className='red';
@@ -251,8 +260,7 @@ var popupPlug=(function(){
         this.popup.appendChild(this.popupContact);
         this.pop.appendChild(this.popup);
         document.body.appendChild(this.pop);
-        var visibleEvent=new Event("visibleEvent");
-        document.dispatchEvent(visibleEvent);
+        this.options.visible();
     }
 
     var initializeEvents=function()

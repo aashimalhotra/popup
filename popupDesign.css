@@ -144,7 +144,7 @@
     border-radius: 5px;
 }
 
-.pop-container .orange#closeSuscribed {
+.pop-container .orange#popupCloseSuscribed {
     text-decoration: none;
     width: 75%;
     margin-bottom: 20px;
@@ -159,7 +159,7 @@
     cursor: pointer;
     border-radius: 5px;
 }
-.pop-container .red#closeSuscribed {
+.pop-container .red#popupCloseSuscribed {
     text-decoration: none;
     width: 75%;
     margin-bottom: 20px;
@@ -174,7 +174,7 @@
     cursor: pointer;
     border-radius: 5px;
 }
-.pop-container .orange#closeSuccess {
+.pop-container .orange#popupCloseSuccess {
     text-decoration: none;
     width: 75%;
     margin-bottom: 20px;
@@ -189,7 +189,7 @@
     cursor: pointer;
     border-radius: 5px;
 }
-.pop-container .red#closeSuccess {
+.pop-container .red#popupCloseSuccess {
     text-decoration: none;
     width: 75%;
     margin-bottom: 20px;
