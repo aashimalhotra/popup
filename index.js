@@ -23,7 +23,7 @@ var popupPlug=(function(){
         }
         if(this.options.defaultBehaviour=='on')
         {
-            document.addEventListener('mouseleave',triggerCallback);
+            document.getElementsByTagName('body')[0].addEventListener('mouseleave',triggerCallback);
             if(isMobile(window))
             {
                 var flag70=0;
@@ -64,7 +64,7 @@ var popupPlug=(function(){
 
     Popup.prototype.removeDefault= function()
     {
-        document.removeEventListener("mouseleave", triggerCallback);
+        document.getElementsByTagName('body')[0].removeEventListener('mouseleave',triggerCallback);
     }
 
     Popup.prototype.remove = function()
@@ -181,10 +181,10 @@ var popupPlug=(function(){
         if(this.options.form) {
             subscribed=document.createElement("div");
             subscribed.className='subscribed';
-            subscribed.innerHTML='You Are Already Subscribed!';
+            subscribed.innerHTML='You are already subscribed!';
             thankyou=document.createElement("div");
             thankyou.className='thankyou';
-            thankyou.innerHTML='Thankyou For Subscribing With Us!';
+            thankyou.innerHTML='Thankyou for subscribing with us!';
             formElements=document.createElement("div");
             formElements.className='formElements';
             form=document.createElement("form");
