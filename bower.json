@@ -7,5 +7,8 @@
   ],
   "description": "popup for customer to register email when an event occurs",
   "license": "MIT",
-  "homepage": ""
+  "homepage": "",
+  "dependencies": {
+    "jquery": "1.9.1 - 3"
+  }
 }

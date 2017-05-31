@@ -23,7 +23,7 @@ var popupPlug=(function(){
         }
         if(this.options.defaultBehaviour=='on')
         {
-            document.getElementsByTagName('body')[0].addEventListener('mouseleave',triggerCallback);
+            $(document).on('mouseleave',triggerCallback);
             if(isMobile(window))
             {
                 var flag70=0;
@@ -47,7 +47,7 @@ var popupPlug=(function(){
        return /iPhone|iPod|iPad|Silk|Android|BlackBerry|Opera Mini|IEMobile/.test(data)
     }
 
-    var triggerCallback=function()
+    var triggerCallback=function(event)
     {
         if(popupObj.trigger!=true)
         {
@@ -64,7 +64,7 @@ var popupPlug=(function(){
 
     Popup.prototype.removeDefault= function()
     {
-        document.getElementsByTagName('body')[0].removeEventListener('mouseleave',triggerCallback);
+        $(document).off('mouseleave',triggerCallback);
     }
 
     Popup.prototype.remove = function()
