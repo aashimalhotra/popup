@@ -33,7 +33,11 @@ var popupPlug=(function(){
                     var height = (wintop/(winHeight))*100;
                     if(height>65 && flag70==0)
                     {
-                        triggerCallback();
+                        if(popupObj.trigger!=true)
+                        {
+                            popupObj.trigger=true;
+                            popupObj.open();
+                        }
                         flag70=1;
                     }                 
                 });
@@ -49,7 +53,8 @@ var popupPlug=(function(){
 
     var triggerCallback=function(event)
     {
-        if(popupObj.trigger!=true)
+        var scroll = window.pageYOffset || document.documentElement.scrollTop;
+        if((event.pageY-scroll) < 7 && popupObj.trigger!=true)
         {
             popupObj.trigger=true;
             popupObj.open();
@@ -60,6 +65,14 @@ var popupPlug=(function(){
     {
         buildOut.call(this);
         initializeEvents.call(this);
+        $(document).on('keypress',enterBind);
+    }
+
+    var enterBind= function(e){
+        if (e.which == 13 || e.keyCode==13){
+            e.preventDefault();
+            $("#popupSubmit").click();
+        }
     }
 
     Popup.prototype.removeDefault= function()
@@ -89,6 +102,7 @@ var popupPlug=(function(){
                 {
                     subscribe.call(that);
                 }
+                $(document).off('keypress',enterBind);
             },function(err){
                 // console.log("error in registering");
             });
@@ -117,7 +131,7 @@ var popupPlug=(function(){
         })
     }
 
-    var close = function()
+    var close = function(event)
     {
         this.trigger=false;
         this.options.close(this);
@@ -217,14 +231,14 @@ var popupPlug=(function(){
             noEmail.id="noEmail";
             formElements.appendChild(noEmail);
             submit=document.createElement("button");
-            submit.id="submit";
+            submit.id="popupSubmit";
             if(this.options.theme=='red')
             {
-                submit.className='red';
+                submit.className='popupRed';
             }
             else
             {
-                submit.className='orange';
+                submit.className='popupOrange';
             }
             submit.innerHTML=this.options.submitText;
             closeSuccess=document.createElement("button");
@@ -268,8 +282,9 @@ var popupPlug=(function(){
         if (this.closeButton) {
             document.getElementById("close").addEventListener('click', close.bind(this));
         }
-        document.getElementById("submit").addEventListener('click',validateEmail.bind(this));
+        document.getElementById("popupSubmit").addEventListener('click',validateEmail.bind(this));
     }
 
     return Popup;
 })();
+

@@ -45,7 +45,7 @@
     position: relative;
     left: 50%;
     top: 50%;
-    width: 380px;
+    width: 360px;
     transform: translate(-50%, -50%);
     transform-origin: 0 0;
     font-family: 'Raleway', sans-serif;
@@ -115,7 +115,7 @@
     font-family: raleway;
     margin-bottom: 30px;
 }
-.pop-container .orange#submit {
+.pop-container .popupOrange#popupSubmit {
     text-decoration: none;
     width: 75%;
     margin-bottom: 20px;
@@ -129,7 +129,7 @@
     cursor: pointer;
     border-radius: 5px;
 }
-.pop-container .red#submit {
+.pop-container .popupRed#popupSubmit {
     text-decoration: none;
     width: 75%;
     margin-bottom: 20px;
@@ -214,4 +214,5 @@
     display: none;
     margin-bottom: 10px;
 }
+
 
