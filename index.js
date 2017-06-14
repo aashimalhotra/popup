@@ -1,205 +1,180 @@
-(function(a){
-    var newHandler;
-    function Popup(){
-        //element references
-        this.trigger=false;
+(function(windowObject) {
+    var newHandler, popupState = {
+        screen: 0,
+        trigger: false,
+        popupElement: null,
+        scrollFlag: false
+    };
 
-        // default parameters if user does not provide
+    function Popup() {
         var defaults = {
             mainHeading: 'Before Leaving Us!',
             para: 'Get FREE access to Real-Estate tips & useful resources.',
             submitText: 'Yes I Am Interested',
             closeText: 'Close',
             closeButton: true,
+            formType: 'email',
+            minusScroll: 5,
             defaultBehaviour: false,
-            form: {email: ""},
-            callback: function(){},
+            form: {
+                email: ""
+            },
+            callback: function() {},
             scrollPercentage: 70
         }
-        this.options=defaults;
-        if (arguments[0] && typeof arguments[0] === "object" && arguments[0].length==undefined) {
+        this.options = defaults;
+        if (arguments[0] && typeof arguments[0] === "object" && arguments[0].toString() == "[object Object]") {
             this.options = extendDefaults(defaults, arguments[0]);
         }
-        if(this.options.defaultBehaviour)
-        {
-            newHandler=triggerCallback.bind(this);
-            $(document).on('mouseleave',newHandler);
-            if(isMobile(window))
-            {
-                if(this.options.scrollPercentage>90)
-                {
-                    this.options.scrollPercentage=90;
-                }
-                var scrollFlag=0,that=this;
-                $(window).scroll(function(){
-                    var winHeight= $(document).height();
-                    var wintop = $(window).scrollTop();
-                    var height = (wintop/(winHeight))*100;
-                    if(height>(that.options.scrollPercentage-5) && scrollFlag==0)
-                    {
-                        if(that.trigger!=true)
-                        {
-                            that.trigger=true;
-                            that.open();
-                        }
-                        scrollFlag=1;
-                    }                 
-                });
+        if (this.options.defaultBehaviour) {
+            newHandler = triggerCallback.bind(this);
+            $(document).on('mouseleave', newHandler);
+            if (isMobile(window)) {
+                this.options.scrollPercentage = this.options.scrollPercentage < 90 ? this.options.scrollPercentage : 90;
+                $(window).scroll(triggerCallbackMobile.bind(this));
             }
         }
     }
 
     var isMobile = function($window) {
-       var data = $window.navigator.userAgent || $window.navigator.vendor || $window.opera;
-       return /iPhone|iPod|iPad|Silk|Android|BlackBerry|Opera Mini|IEMobile/.test(data)
+        var data = $window.navigator.userAgent || $window.navigator.vendor || $window.opera;
+        return /iPhone|iPod|iPad|Silk|Android|BlackBerry|Opera Mini|IEMobile/.test(data)
     }
 
-    var triggerCallback=function(event){
+    var triggerCallback = function(event) {
         var scroll = window.pageYOffset || document.documentElement.scrollTop;
-        if((event.pageY-scroll) < 7 && this.trigger!=true)
-        {
-            this.trigger=true;
+        if ((event.pageY - scroll) < 7 && popupState.trigger != true) {
+            popupState.trigger = true;
             this.open();
         }
     }
 
-    Popup.prototype.open = function(){
-        if(this.options.formType=='lead')
-        {
-            buildOutLead.call(this);
+    var triggerCallbackMobile = function() {
+        var winHeight = $(document).height();
+        var wintop = $(window).scrollTop();
+        var height = (wintop / (winHeight)) * 100;
+        if (height > (this.options.scrollPercentage - this.options.minusScroll) && !popupState.scrollFlag) {
+            if (!popupState.trigger) {
+                popupState.trigger = true;
+                this.open();
+            }
+            popupState.scrollFlag = true;
         }
-        else
-        {
+    }
+
+    Popup.prototype.open = function() {
+        if (this.options.formType == 'lead') {
+            buildOutLead.call(this);
+        } else {
             buildOutEmail.call(this);
         }
+        popupState.popupElement = document.querySelector('[data-container-popup]')
+        popupState.screen++;
         initializeEvents.call(this);
-        $(document).on('keypress',enterBind);
-    }
-
-    var enterBind= function(e){
-        if (e.which == 13 || e.keyCode==13){
-            e.preventDefault();
-            $("#popupSubmit").click();
+        $(document).on('keypress', enterBind);
+        if (typeof this.options.callback === "function") {
+            this.options.callback(null, {
+                action: 'visible'
+            });
         }
     }
 
-    Popup.prototype.removeDefault= function()
-    {
-        $(document).off('mouseleave',newHandler);
+    var enterBind = function(e) {
+        if (e.which == 13 || e.keyCode == 13) {
+            $('[data-submitPopup]').click();
+        }
     }
 
-    Popup.prototype.remove = function()
-    {
+    Popup.prototype.removeDefault = function() {
+        $(document).off('mouseleave', newHandler);
+    }
+
+    Popup.prototype.remove = function() {
+        popupState.screen = 0;
         this.popup.parentNode.removeChild(this.popup);
 
     }
 
-    var submitLead = function(event)
-    {
-        event.preventDefault();
-        this.trigger=false;
-        document.getElementsByClassName('popupStartLead')[0].parentNode.removeChild(document.getElementsByClassName('popupStartLead')[0]);
-        if(typeof this.options.callback ==="function"){
-            this.options.callback(null,'submit');
+    var submitLead = function(event) {
+        popupState.trigger = false;
+        popupState.popupElement.parentNode.removeChild(popupState.popupElement);
+        popupState.screen = 0;
+        if (typeof this.options.callback === "function") {
+            this.options.callback(null, {
+                action: 'submit'
+            });
         }
     }
 
-    var submit = function()
-    {
-        this.trigger=false;
-        if(typeof this.options.callback ==="function"){
-        var userInfo = { email: document.getElementsByClassName("email")[0].value
+    var submit = function() {
+        popupState.trigger = false;
+        if (typeof this.options.callback === "function") {
+            var userInfo = {
+                email: popupState.popupElement.querySelector('[data-emailPopup]').value
             }
-            var that =this;
-            this.options.callback(userInfo,'submit');
-            $(document).off('keypress',enterBind);
+            var that = this;
+            this.options.callback(userInfo, {
+                action: 'submit'
+            });
+            popupState.screen++;
+            $(document).off('keypress', enterBind);
         }
     }
 
-    Popup.prototype.processResults= function(result){
-        if(result=='Already Subscribed')
-        {
+    Popup.prototype.processResults = function(result) {
+        if (result == 'Already Subscribed') {
             showAlreadySubscribed.call(that);
-        }
-        else if(result=='success')
-        {
+        } else if (result == 'success') {
             subscribe.call(that);
         }
     }
 
-    var subscribe = function()
-    {
-        var that=this;
-        document.getElementsByClassName('popupContact')[0].getElementsByClassName('formElements')[0].style.display='none';
-        document.getElementsByClassName('popupContact')[0].getElementsByClassName('thankyou')[0].style.display='block';
-        if(this.options.theme=='red')
-        {
-            var closeSuccess=document.getElementsByClassName("popupCloseSuccessRed")[0];
-        }
-        else
-        {
-            var closeSuccess=document.getElementsByClassName("popupCloseSuccessRed")[0];   
-        }
-        closeSuccess.addEventListener('click',function(event){
-            event.preventDefault();
-            that.options.callback(null,'subscribeClose');
+    var subscribe = function() {
+        var that = this;
+        popupState.popupElement.querySelector('[data-contactPopup]').querySelector('data-formPopup').style.display = 'none';
+        popupState.popupElement.querySelector('data-contactPopup').querySelector('data-thankyouPopup').style.display = 'block';
+        var closeSuccess = popupState.popupElement.querySelector('[data-sucessPopup]');
+        closeSuccess.addEventListener('click', function(event) {
+            that.options.callback(null, {
+                action: 'subscribeClose'
+            });
         })
     }
 
-    var showAlreadySubscribed = function()
-    {
-        var that=this;
-        document.getElementsByClassName('popupContact')[0].getElementsByClassName('formElements')[0].style.display='none';
-        document.getElementsByClassName('popupContact')[0].getElementsByClassName('subscribed')[0].style.display='block';
-        if(this.options.theme=='red')
-        {
-            var closeSuccess=document.getElementsByClassName("popupCloseSubscribedRed")[0];
-        }
-        else
-        {
-            var closeSuccess=document.getElementsByClassName("popupCloseSubscribedOrange")[0];   
-        }
-        closeSuccess.addEventListener('click',function(event){
-            event.preventDefault();
-            that.options.callback(null,'subscribeClose');
+    var showAlreadySubscribed = function() {
+        var that = this;
+        popupState.popupElement.querySelector('[data-contactPopup]').querySelector('[data-formPopup]').style.display = 'none';
+        popupState.popupElement.querySelector('[data-contactPopup]').querySelector('[data-subscribedPopup]').style.display = 'block';
+        var closeSuccess = popupState.popupElement.querySelector('[data-subscribedPopup]')[0];
+        closeSuccess.addEventListener('click', function(event) {
+            that.options.callback(null, {
+                action: 'subscribeClose'
+            });
         })
     }
 
-    var close = function(event)
-    {
-        this.trigger=false;
-        if(typeof this.options.callback === 'function')
-        {
-            this.options.callback(null,'close');
+    var close = function(event) {
+        popupState.trigger = false;
+        if (typeof this.options.callback === 'function') {
+            this.options.callback(null, {
+                action: 'close'
+            });
         }
-        if(this.options.formType=='lead')
-        {
-            document.getElementsByClassName('popupStartLead')[0].parentNode.removeChild(document.getElementsByClassName('popupStartLead')[0]);
-        }
-        else
-        {
-            document.getElementsByClassName('popupStart')[0].parentNode.removeChild(document.getElementsByClassName('popupStart')[0]);            
-        }
-
+        popupState.popupElement.parentNode.removeChild(popupState.popupElement);
+        popupState.screen = 0;
     }
 
-    var validateEmail = function(event)
-    {
+    var validateEmail = function(event) {
         var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        var email= document.getElementsByClassName("email")[0].value.toLowerCase();
-        if(re.test(email)===true)
-        {
-            event.preventDefault();
+        var email = popupState.popupElement.querySelector('[data-emailPopup]').value.toLowerCase();
+        if (re.test(email) === true) {
             submit.call(this);
-        }
-        else
-        {
-            event.preventDefault();
-            document.getElementsByClassName("noEmail")[0].style.display= "block";
+        } else {
+            popupState.popupElement.querySelector('[data-noEmailPopup]').style.display = "block";
         }
     }
 
-    var extendDefaults= function(source, properties) {
+    var extendDefaults = function(source, properties) {
         var property;
         for (property in properties) {
             if (properties.hasOwnProperty(property)) {
@@ -209,141 +184,86 @@
         return source;
     }
 
-    var buildOutLead=function(){
-        var form,closeButton,html,pop;
+    var buildOutLead = function() {
+        var form, closeButton, html, pop;
 
         //popup div
         if (this.options.closeButton === true) {
-            closeButton = '<button class="closeLead">X</button>';
+            closeButton = '<button class="closeLead" data-closePopup>X</button>';
         }
-        if(this.options.form) {
-            form='<form class="formLead"> \
-            <h2 class="leadHeading">'+this.options.mainHeading+'</h2>\
-            <div class="formElementsLead">\
-            <p>'+this.options.para+'</p>\
-            <button class="leadSubmit">'+this.options.submitText+'</button>\
-            </div>\
-            </form>';
-        }
-        html='<div class="popupStartLead">\
-            <div class="popupContactLead">'+closeButton+form+'\
+        if (this.options.form) {
+            form = '<div class="formLead"> \
+            <h2 class="leadHeading" data-headingPopup>' + this.options.mainHeading + '</h2>\
+            <div class="formElementsLead" data-formPopup>\
+            <p>' + this.options.para + '</p>\
+            <button class="leadSubmit" data-submitPopup>' + this.options.submitText + '</button>\
             </div>\
             </div>';
-        pop=document.createElement('div');
-        pop.innerHTML=html;
-        pop.className='pop-container';
-        document.body.appendChild(pop);
-        if(typeof this.options.callback ==="function"){
-            this.options.callback(null,'visible');
         }
+        html = '<div class="popupStartLead" data-startPopup>\
+            <div class="popupContactLead" data-contactPopup>' + closeButton + form + '\
+            </div>\
+            </div>';
+        pop = document.createElement('div');
+        pop.innerHTML = html;
+        pop.className = 'pop-container';
+        pop.dataset.containerPopup = '';
+        document.body.appendChild(pop);
     }
 
-    var buildOutEmail=function(){
-        var form,closeButton,pop,html,email,heading,closeSuccess,closeSuscribed,submit;
+    var buildOutEmail = function() {
+        var form, closeButton, pop, html, email, heading, closeSuccess, closeSuscribed, submit;
 
         //popup div
-        if (this.options.closeButton === true) {
-            if(this.options.theme=='red')
-            {
-                closeButton='<button class="closeRed">X</button>';
-            }
-            else
-            {
-                closeButton='<button class="closeOrange">X</button>';
-            }
-        }
-        if(this.options.form) {
-            if(this.options.theme=='red')
-            {
-                heading='<h2 class="leaveHeadingRed">'+this.options.mainHeading+'</h2>';
-            }
-            else
-            {
-                heading='<h2 class="leaveHeadingOrange">'+this.options.mainHeading+'</h2>';
-            }
-            if(this.options.form.email!=null)
-            {
-                email='<input class="email" placeholder="email" type="text">';
-            }
-            var noEmail='<div class="noEmail">please enter valid email address</div>';
-            if(this.options.theme=='red')
-            {
-                submit='<button class="popupSubmitRed">'+this.options.submitText+'</button>';
-            }
-            else
-            {
-                submit='<button class="popupSubmitOrange">'+this.options.submitText+'</button>';
-            }
-            if(this.options.theme=='red')
-            {
-                closeSuccess='<button class="popupCloseSuccessRed">Close</button>';
-            }
-            else
-            {
-                closeSuccess='<button class="popupCloseSuccessOrange">Close</button>';
-            }
-            if(this.options.theme=='red')
-            {
-                closeSuscribed='<button class="popupCloseSuscribedRed">Close</button>';
-            }
-            else
-            {
-                closeSuscribed='<button class="popupCloseSuscribedOrange">Close</button>';
-            }
-            form='<form>'+heading+closeButton+'\
-                <div class="formElements"><p>'+this.options.para+'</p>\
-                '+email+noEmail+submit+'</div>\
-                <div class="subscribed">You are already subscribed!\
-                '+closeSuscribed+'</div>\
-                <div class="thankyou">Thankyou for subscribing with us!'+closeSuccess+'</div>\
-                </form>';
-        }
-        html='<div class="popupStart">\
-            <div class="popupContact">'+form+'</div></div>';
-        pop=document.createElement('div');
-        pop.className='pop-container';
-        pop.innerHTML=html;
-        document.body.appendChild(pop);
-        if(typeof this.options.callback ==="function"){
-            this.options.callback(null,'visible');
-        }
-    }
-
-    var initializeEvents=function()
-    {
         if (this.options.closeButton) {
-            if(this.options.formType=='lead')
-            {
-                document.getElementsByClassName("closeLead")[0].addEventListener('click', close.bind(this));
-            }
-            else
-            {
-                if(this.options.theme=='red')
-                {
-                    document.getElementsByClassName("closeRed")[0].addEventListener('click', close.bind(this));
-                }
-                else
-                {
-                    document.getElementsByClassName("closeOrange")[0].addEventListener('click', close.bind(this));
-                }
+            if (this.options.theme == 'red') {
+                closeButton = '<button class="closeRed" data-closePopup>X</button>';
+            } else {
+                closeButton = '<button class="closeOrange" data-closePopup>X</button>';
             }
         }
-        if(this.options.formType=='lead')
-        {
-            document.getElementsByClassName("leadSubmit")[0].addEventListener('click',submitLead.bind(this));
+        if (this.options.form) {
+            if (this.options.theme == 'red') {
+                heading = '<h2 class="leaveHeadingRed" data-headingPopup>' + this.options.mainHeading + '</h2>';
+                submit = '<button class="popupSubmitRed" data-submitPopup>' + this.options.submitText + '</button>';
+                closeSuccess = '<button class="popupCloseSuccessRed" data-sucessPopup>Close</button>';
+                closeSuscribed = '<button class="popupCloseSuscribedRed" data-subscribedPopup>Close</button>';
+            } else {
+                heading = '<h2 class="leaveHeadingOrange" data-headingPopup>' + this.options.mainHeading + '</h2>';
+                submit = '<button class="popupSubmitOrange" data-submitPopup>' + this.options.submitText + '</button>';
+                closeSuccess = '<button class="popupCloseSuccessOrange" data-sucessPopup>Close</button>';
+                closeSuscribed = '<button class="popupCloseSuscribedOrange" data-subscribedPopup>Close</button>';
+            }
+            if (this.options.form.email != null) {
+                email = '<input class="email" placeholder="email" type="text" data-emailPopup>';
+            }
+            var noEmail = '<div class="noEmail" data-noEmailPopup>please enter valid email address</div>';
+            form = '<div class="formPopup">' + heading + closeButton + '\
+                <div class="formElements" data-formPopup><p>' + this.options.para + '</p>\
+                ' + email + noEmail + submit + '</div>\
+                <div class="subscribed" data-alreadySubscribed>You are already subscribed!\
+                ' + closeSuscribed + '</div>\
+                <div class="thankyou" data-thankyouPopup>Thankyou for subscribing with us!' + closeSuccess + '</div>\
+                </div>';
         }
-        else
-        {
-            if(this.options.theme=='red')
-            {
-                document.getElementsByClassName("popupSubmitRed")[0].addEventListener('click',validateEmail.bind(this));   
-            }
-            else
-            {
-                document.getElementsByClassName("popupSubmitOrange")[0].addEventListener('click',validateEmail.bind(this));                
-            }
+        html = '<div class="popupStart" data-startPopup>\
+            <div class="popupContact" data-contactPopup>' + form + '</div></div>';
+        pop = document.createElement('div');
+        pop.className = 'pop-container';
+        pop.innerHTML = html;
+        pop.dataset.containerPopup = '';
+        document.body.appendChild(pop);
+    }
+
+    var initializeEvents = function() {
+        if (this.options.closeButton) {
+            popupState.popupElement.querySelector('[data-closePopup').addEventListener('click', close.bind(this));
+        }
+        if (this.options.formType == 'lead') {
+            popupState.popupElement.querySelector('[data-submitPopup]').addEventListener('click', submitLead.bind(this));
+        } else {
+            popupState.popupElement.querySelector('[data-submitPopup]').addEventListener('click', submit.bind(this));
         }
     }
-    a.popupPlug=Popup;
+    windowObject.popupPlug = Popup;
 })(window);
-
