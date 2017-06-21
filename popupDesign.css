@@ -28,7 +28,7 @@
 }
 
 .pop-container .leadHeading {
-    margin: 0 384px 0 384px;
+    margin: 0 378px 0 378px;
     font-size: 29px;
     font-weight: 600;
     color: white;
@@ -292,5 +292,10 @@
 	margin: 0px 12px;
         padding: 12px 18px 12px 18px;
     }
+    .pop-container .popupStartLead .formLead p{
+        padding-left: 15px;
+        padding-right: 15px;
+    }
 }
+
 
