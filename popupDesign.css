@@ -11,6 +11,12 @@
     background-color: #87bb61;
 }
 
+.pop-container .popupContactLead {
+    display: inline-block;
+    width: 600px;
+    height: 400px;
+    vertical-align: middle;
+}
 
 .pop-container .closeLead {
     right: 25px;
@@ -27,21 +33,31 @@
     border-style: none;
 }
 
+.pop-container .popupStartLead:before {
+    display: inline-block;
+    width: 0px;
+    margin-top: 20%;
+    height: 100%;
+    content: '';
+    text-align: center;
+    vertical-align: middle;
+}
+
 .pop-container .leadHeading {
-    margin: 0 378px 0 378px;
+    /*margin: 0 378px 0 378px;*/
     font-size: 29px;
     font-weight: 600;
     color: white;
 }
 
 
-.pop-container .popupStartLead .formLead{
+/*.pop-container .popupStartLead .formLead{
     border-radius: 10px;
     text-align: center;
     position: absolute;
     left: 0%;
     top: 36%;
-}
+}*/
 
 .pop-container .popupStartLead .formLead p{
     margin-top: 15px;
@@ -297,5 +313,6 @@
         padding-right: 15px;
     }
 }
+
 
 
